@@ -24,6 +24,7 @@ function init() {
     updateUI();
     loadSavedMessages();
     syncBuildingSelects();
+    restoreLastAddress(); // 마지막 동/호수 자동 복원
     createOverlayModal();
 }
 
@@ -63,6 +64,7 @@ function setupEventListeners() {
             const phrase = btn.dataset.phrase;
             const isCommon = btn.dataset.common === 'true';
             addMessage(phrase, isCommon);
+            saveLastAddress(); // 마지막 주소 저장
             btn.style.transform = 'scale(0.9)';
             setTimeout(() => btn.style.transform = '', 150);
         });
@@ -73,6 +75,49 @@ function setupEventListeners() {
 
     clearBtn.addEventListener('click', clearAll);
     sendBtn.addEventListener('click', sendToKakao);
+
+    // ⚡ 퀵 액션 버튼
+    setupQuickActions();
+}
+
+// ===== ⚡ 퀵 액션 (원 탭) =====
+function setupQuickActions() {
+    const quickBtns = document.querySelectorAll('.quick-btn[data-phrase]');
+    const quickCamera = document.getElementById('quickCamera');
+
+    quickBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            addMessage(btn.dataset.phrase, true); // 공통 메시지로 추가
+            btn.style.transform = 'scale(0.9)';
+            setTimeout(() => btn.style.transform = '', 150);
+            if (navigator.vibrate) navigator.vibrate(30);
+        });
+    });
+
+    if (quickCamera) {
+        quickCamera.addEventListener('click', () => {
+            cameraInput?.click();
+        });
+    }
+}
+
+// ===== 마지막 주소 저장/복원 =====
+function saveLastAddress() {
+    const addr = getCurrentAddress();
+    localStorage.setItem('lastBuilding', addr.building);
+    if (addr.room) localStorage.setItem('lastRoom', addr.room);
+}
+
+function restoreLastAddress() {
+    const lastBuilding = localStorage.getItem('lastBuilding');
+    const lastRoom = localStorage.getItem('lastRoom');
+
+    if (lastBuilding) {
+        document.querySelectorAll('.building-select').forEach(s => s.value = lastBuilding);
+    }
+    if (lastRoom) {
+        document.querySelectorAll('input[type="number"][id^="roomNumber"]').forEach(i => i.value = lastRoom);
+    }
 }
 
 // ===== 사진 위치 가져오기 =====

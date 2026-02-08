@@ -122,6 +122,44 @@ body {
     display: block
 }
 
+/* ⚡ 퀵 액션 바 */
+.quick-actions {
+    display: flex;
+    gap: 8px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, rgba(255, 200, 0, .15), rgba(255, 150, 0, .1));
+    border-bottom: 1px solid rgba(255, 200, 0, .2)
+}
+
+.quick-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: .8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+    background: linear-gradient(135deg, var(--accent-green), #4caf50);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .2)
+}
+
+.quick-btn:active {
+    transform: scale(.95)
+}
+
+.quick-btn.urgent {
+    background: linear-gradient(135deg, #ef5350, #c62828);
+    animation: pulse 2s infinite
+}
+
+.quick-btn.camera {
+    flex: 0 0 50px;
+    background: linear-gradient(135deg, #1565c0, #0d47a1);
+    font-size: 1.2rem
+}
+
 /* 메인 */
 .main-content {
     flex: 1;
