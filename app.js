@@ -2,6 +2,7 @@
 let messages = [];
 let photos = []; // {file, overlay} 객체 배열
 let currentPhotoIndex = -1; // 오버레이 편집 중인 사진
+let lastAction = '시설점검'; // 마지막 선택한 조치명 (사진 오버레이 자동 적용)
 
 // ===== DOM 요소 =====
 const dateDisplay = document.getElementById('dateDisplay');
@@ -65,7 +66,8 @@ function setupEventListeners() {
             const phrase = btn.dataset.phrase;
             const isCommon = btn.dataset.common === 'true';
             addMessage(phrase, isCommon);
-            saveLastAddress(); // 마지막 주소 저장
+            saveLastAddress();
+            lastAction = phrase; // 사진 오버레이 조치명에 자동 적용
             btn.style.transform = 'scale(0.9)';
             setTimeout(() => btn.style.transform = '', 150);
         });
@@ -153,8 +155,9 @@ function setupTemplateBuilder() {
             const status = btn.dataset.status;
             const message = `입주민 요청 ${selectedTerm} ${status}`;
 
-            addMessage(message, false); // 동/호수는 기존 코드에서 자동 추가
+            addMessage(message, false);
             saveLastAddress();
+            lastAction = `${selectedTerm} ${status}`; // 사진 오버레이에도 적용
 
             // 시각 피드백
             btn.classList.add('selected');
@@ -215,7 +218,7 @@ function handlePhotoInput(e) {
                 file: file,
                 overlay: {
                     location: location,
-                    action: '시설점검',
+                    action: lastAction, // 마지막 선택한 조치명 자동 적용
                     time: timeStr,
                     enabled: true
                 }
