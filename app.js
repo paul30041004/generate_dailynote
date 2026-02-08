@@ -439,7 +439,7 @@ async function sendToKakao() {
     if (normal.length) body += '📋 점검/인계\n' + normal.map(m => `• ${m}`).join('\n');
     if (photos.length) body += `\n\n📷 첨부사진: ${photos.length}장`;
 
-    const fullMessage = `🏢 LH 당직 인계 (${dateStr} ${timeStr})\n\n${body.trim()}\n\n- 당직자 올림`;
+    const fullMessage = `🏢 음성금석LH2단지 인계 (${dateStr} ${timeStr})\n\n${body.trim()}\n\n- 당직자 올림`;
 
     // 오버레이된 사진 생성
     let processedPhotos = [];
