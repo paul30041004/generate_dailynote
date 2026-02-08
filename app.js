@@ -1,10 +1,15 @@
 // ===== 앱 상태 =====
 let messages = [];
+let photos = []; // 사진 배열 (File 객체)
 
 // ===== DOM 요소 =====
 const dateDisplay = document.getElementById('dateDisplay');
 const messageList = document.getElementById('messageList');
 const messageCount = document.getElementById('messageCount');
+const photoCount = document.getElementById('photoCount');
+const photoPreview = document.getElementById('photoPreview');
+const cameraInput = document.getElementById('cameraInput');
+const galleryInput = document.getElementById('galleryInput');
 const clearBtn = document.getElementById('clearBtn');
 const sendBtn = document.getElementById('sendBtn');
 const phraseButtons = document.querySelectorAll('.phrase-btn');
@@ -47,15 +52,54 @@ function setupEventListeners() {
         btn.addEventListener('click', () => {
             const phrase = btn.dataset.phrase;
             const isCommon = btn.dataset.common === 'true';
-            const isMove = btn.dataset.move === 'true';
-            addMessage(phrase, isCommon, isMove);
+            addMessage(phrase, isCommon);
             btn.style.transform = 'scale(0.9)';
             setTimeout(() => btn.style.transform = '', 150);
         });
     });
 
+    // 사진 입력
+    if (cameraInput) cameraInput.addEventListener('change', handlePhotoInput);
+    if (galleryInput) galleryInput.addEventListener('change', handlePhotoInput);
+
     clearBtn.addEventListener('click', clearAll);
     sendBtn.addEventListener('click', sendToKakao);
+}
+
+// ===== 사진 처리 =====
+function handlePhotoInput(e) {
+    const files = Array.from(e.target.files);
+    files.forEach(file => {
+        if (file.type.startsWith('image/')) {
+            photos.push(file);
+        }
+    });
+    e.target.value = ''; // 같은 파일 재선택 가능
+    updatePhotoUI();
+    if (navigator.vibrate) navigator.vibrate(30);
+}
+
+function removePhoto(index) {
+    photos.splice(index, 1);
+    updatePhotoUI();
+}
+
+function updatePhotoUI() {
+    photoCount.textContent = `${photos.length}장`;
+    if (photos.length === 0) {
+        photoPreview.innerHTML = '';
+    } else {
+        photoPreview.innerHTML = photos.map((file, i) => {
+            const url = URL.createObjectURL(file);
+            return `
+                <div class="photo-item">
+                    <img src="${url}" alt="사진 ${i + 1}">
+                    <button class="remove-photo" onclick="removePhoto(${i})">✕</button>
+                </div>
+            `;
+        }).join('');
+    }
+    updateSendButton();
 }
 
 // ===== 탭 전환 =====
@@ -65,11 +109,11 @@ function switchTab(tabId) {
     if (navigator.vibrate) navigator.vibrate(20);
 }
 
-// ===== 현재 동/호수 가져오기 =====
+// ===== 현재 동/호수 =====
 function getCurrentAddress() {
     const activeTab = document.querySelector('.tab-content.active');
-    const buildingSelect = activeTab.querySelector('.building-select') || document.getElementById('buildingNumber');
-    const roomInput = activeTab.querySelector('input[type="number"]') || document.getElementById('roomNumber');
+    const buildingSelect = activeTab?.querySelector('.building-select') || document.getElementById('buildingNumber');
+    const roomInput = activeTab?.querySelector('input[type="number"]') || document.getElementById('roomNumber');
     return {
         building: buildingSelect ? buildingSelect.value : '201',
         room: roomInput ? roomInput.value.trim() : ''
@@ -77,7 +121,7 @@ function getCurrentAddress() {
 }
 
 // ===== 메시지 추가 =====
-function addMessage(phrase, isCommon = false, isMove = false) {
+function addMessage(phrase, isCommon = false) {
     const addr = getCurrentAddress();
     let message;
 
@@ -105,24 +149,21 @@ function addMessage(phrase, isCommon = false, isMove = false) {
     updateUI();
     saveMessages();
     if (navigator.vibrate) navigator.vibrate(30);
-
-    const preview = document.querySelector('.preview-section');
-    if (preview) preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// ===== 메시지 삭제 =====
 function deleteMessage(index) {
     messages.splice(index, 1);
     updateUI();
     saveMessages();
 }
 
-// ===== 전체 삭제 =====
 function clearAll() {
-    if (messages.length === 0) return;
-    if (confirm('모든 내용을 삭제하시겠습니까?')) {
+    if (messages.length === 0 && photos.length === 0) return;
+    if (confirm('모든 내용과 사진을 삭제하시겠습니까?')) {
         messages = [];
+        photos = [];
         updateUI();
+        updatePhotoUI();
         saveMessages();
     }
 }
@@ -132,7 +173,6 @@ function updateUI() {
     messageCount.textContent = `${messages.length}건`;
     if (messages.length === 0) {
         messageList.innerHTML = '<p class="placeholder-text">버튼을 눌러 인계사항을 추가하세요</p>';
-        sendBtn.disabled = true;
     } else {
         messageList.innerHTML = messages.map((msg, i) => `
             <div class="message-item">
@@ -140,8 +180,12 @@ function updateUI() {
                 <button class="delete-btn" onclick="deleteMessage(${i})">✕</button>
             </div>
         `).join('');
-        sendBtn.disabled = false;
     }
+    updateSendButton();
+}
+
+function updateSendButton() {
+    sendBtn.disabled = messages.length === 0 && photos.length === 0;
 }
 
 // ===== 로컬 저장 =====
@@ -152,12 +196,14 @@ function loadSavedMessages() {
 }
 
 // ===== 카카오톡 전송 =====
-function sendToKakao() {
-    if (messages.length === 0) return;
+async function sendToKakao() {
+    if (messages.length === 0 && photos.length === 0) return;
+
     const now = new Date();
     const timeStr = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
     const dateStr = now.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
 
+    // 메시지 분류
     const alerts = messages.filter(m => m.includes('🚨') || m.includes('⚠️'));
     const moveOut = messages.filter(m => m.includes('퇴거') || m.includes('원상복구') || m.includes('훼손') || m.includes('미반납'));
     const moveIn = messages.filter(m => m.includes('입주') || m.includes('열쇠 인계') || m.includes('개통'));
@@ -168,26 +214,47 @@ function sendToKakao() {
     if (moveOut.length) body += '📦 퇴거점검\n' + moveOut.map(m => `• ${m}`).join('\n') + '\n\n';
     if (moveIn.length) body += '🏠 입주점검\n' + moveIn.map(m => `• ${m}`).join('\n') + '\n\n';
     if (normal.length) body += '📋 점검/인계\n' + normal.map(m => `• ${m}`).join('\n');
+    if (photos.length) body += `\n\n📷 첨부사진: ${photos.length}장`;
 
     const fullMessage = `🏢 LH 당직 인계 (${dateStr} ${timeStr})\n\n${body.trim()}\n\n- 당직자 올림`;
 
-    if (navigator.share) {
-        navigator.share({ title: 'LH 당직 인계장', text: fullMessage }).then(() => {
-            if (confirm('전송 완료. 초기화할까요?')) { messages = []; updateUI(); saveMessages(); }
-        }).catch(() => { });
-    } else {
-        navigator.clipboard.writeText(fullMessage).then(() => {
-            alert('📋 복사 완료! 카카오톡에 붙여넣기 하세요.');
-        }).catch(() => {
-            const ta = document.createElement('textarea');
-            ta.value = fullMessage;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            alert('📋 복사 완료!');
-        });
+    // Web Share API (사진 포함 공유)
+    if (navigator.share && navigator.canShare) {
+        const shareData = { title: 'LH 당직 인계장', text: fullMessage };
+
+        // 사진 있으면 파일도 포함
+        if (photos.length > 0) {
+            shareData.files = photos;
+        }
+
+        if (navigator.canShare(shareData)) {
+            try {
+                await navigator.share(shareData);
+                if (confirm('전송 완료! 초기화할까요?')) {
+                    messages = []; photos = [];
+                    updateUI(); updatePhotoUI(); saveMessages();
+                }
+                return;
+            } catch (e) { console.log('공유 취소'); }
+        }
     }
+
+    // 폴백: 텍스트만 복사 + 사진 별도 안내
+    navigator.clipboard.writeText(fullMessage).then(() => {
+        let msg = '📋 텍스트가 복사되었습니다!';
+        if (photos.length > 0) {
+            msg += `\n\n📷 사진 ${photos.length}장은 별도로 전송해주세요.`;
+        }
+        alert(msg);
+    }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = fullMessage;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        alert('📋 복사 완료! 사진은 별도 전송해주세요.');
+    });
 }
 
 // Shake 애니메이션
@@ -196,3 +263,4 @@ style.textContent = '@keyframes shake{0%,100%{transform:translateX(0)}25%{transf
 document.head.appendChild(style);
 
 document.addEventListener('DOMContentLoaded', init);
+

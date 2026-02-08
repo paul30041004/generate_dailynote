@@ -457,3 +457,94 @@ body {
     background: rgba(255, 255, 255, .2);
     border-radius: 2px
 }
+
+/* 사진 섹션 */
+.photo-section {
+    background: var(--bg-card);
+    padding: 14px;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 200, 0, .3)
+}
+
+.photo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px
+}
+
+.photo-count {
+    background: var(--accent-orange);
+    color: var(--bg-dark);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: .7rem;
+    font-weight: 700
+}
+
+.photo-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px
+}
+
+.photo-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s
+}
+
+.camera-btn {
+    background: linear-gradient(135deg, #1565c0, #0d47a1);
+    color: #fff
+}
+
+.gallery-btn {
+    background: linear-gradient(135deg, #7b1fa2, #4a148c);
+    color: #fff
+}
+
+.photo-btn:active {
+    transform: scale(.95)
+}
+
+.photo-preview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px
+}
+
+.photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    overflow: hidden
+}
+
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover
+}
+
+.photo-item .remove-photo {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(0, 0, 0, .7);
+    border: none;
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 14px;
+    cursor: pointer
+}

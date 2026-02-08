@@ -459,6 +459,25 @@
                 </div>
             </div>
 
+            <!-- 사진 첨부 섹션 -->
+            <section class="photo-section">
+                <div class="photo-header">
+                    <label class="section-label">📷 현장 사진</label>
+                    <span class="photo-count" id="photoCount">0장</span>
+                </div>
+                <div class="photo-controls">
+                    <label class="photo-btn camera-btn">
+                        📸 촬영
+                        <input type="file" accept="image/*" capture="environment" id="cameraInput" hidden>
+                    </label>
+                    <label class="photo-btn gallery-btn">
+                        🖼️ 갤러리
+                        <input type="file" accept="image/*" multiple id="galleryInput" hidden>
+                    </label>
+                </div>
+                <div class="photo-preview" id="photoPreview"></div>
+            </section>
+
             <!-- 메시지 미리보기 (항상 표시) -->
             <section class="preview-section">
                 <div class="preview-header">
