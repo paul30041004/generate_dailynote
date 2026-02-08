@@ -75,10 +75,29 @@ function setupEventListeners() {
     sendBtn.addEventListener('click', sendToKakao);
 }
 
+// ===== 사진 위치 가져오기 =====
+function getPhotoLocation() {
+    const photoLocationSelect = document.getElementById('photoLocation');
+    const selectedValue = photoLocationSelect ? photoLocationSelect.value : 'unit';
+
+    if (selectedValue === 'unit') {
+        // 세대 선택 시 동/호수 조합
+        const addr = getCurrentAddress();
+        if (addr.room) {
+            return `${addr.building}동 ${addr.room}호`;
+        } else {
+            return `${addr.building}동`;
+        }
+    } else {
+        // 공용시설 선택 시 그대로 반환
+        return selectedValue;
+    }
+}
+
 // ===== 사진 처리 =====
 function handlePhotoInput(e) {
     const files = Array.from(e.target.files);
-    const addr = getCurrentAddress();
+    const location = getPhotoLocation();
     const now = new Date();
     const timeStr = now.toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
@@ -87,7 +106,7 @@ function handlePhotoInput(e) {
             photos.push({
                 file: file,
                 overlay: {
-                    location: addr.room ? `${addr.building}동 ${addr.room}호` : `${addr.building}동`,
+                    location: location,
                     action: '시설점검',
                     time: timeStr,
                     enabled: true

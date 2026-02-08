@@ -482,6 +482,41 @@ body {
     font-weight: 700
 }
 
+.photo-location-select {
+    margin-bottom: 10px
+}
+
+.location-select {
+    width: 100%;
+    background: var(--bg-input) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23fff' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 12px center;
+    border: 2px solid rgba(255, 200, 0, .3);
+    border-radius: var(--radius-sm);
+    padding: 12px 32px 12px 14px;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    -webkit-appearance: none;
+    appearance: none;
+    outline: 0;
+    cursor: pointer
+}
+
+.location-select:focus {
+    border-color: var(--accent-orange)
+}
+
+.location-select optgroup {
+    background: var(--bg-dark);
+    color: var(--accent-orange);
+    font-weight: 600
+}
+
+.location-select option {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    padding: 8px
+}
+
 .photo-controls {
     display: flex;
     gap: 10px;
