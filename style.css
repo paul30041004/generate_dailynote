@@ -269,6 +269,16 @@ body {
     transform: scale(.95)
 }
 
+.term-btn.tool {
+    background: linear-gradient(135deg, #5a4a2a, #4a3a1a);
+    border: 1px solid rgba(255, 200, 100, .3)
+}
+
+.term-btn.tool:active,
+.term-btn.tool.selected {
+    background: linear-gradient(135deg, #ff9800, #f57c00)
+}
+
 .status-buttons {
     display: flex;
     gap: 8px;
