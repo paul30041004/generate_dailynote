@@ -225,45 +225,69 @@ function updatePreviewCanvas() {
     img.src = URL.createObjectURL(photos[currentPhotoIndex].file);
 }
 
-// ===== 오버레이 그리기 =====
+// ===== 오버레이 그리기 (작은 텍스트박스) =====
 function drawOverlayOnCanvas(ctx, w, h, overlay) {
-    const fontSize = Math.max(12, Math.floor(w / 20));
-    const padding = fontSize * 0.5;
-    const lineHeight = fontSize * 1.4;
+    const fontSize = Math.max(10, Math.floor(w / 30)); // 더 작은 폰트
+    const padding = fontSize * 0.4;
+    const lineHeight = fontSize * 1.3;
+    const boxRadius = 4;
 
-    // 상단 바
-    const topBarHeight = lineHeight + padding * 2;
-    ctx.fillStyle = 'rgba(0, 102, 204, 0.85)';
-    ctx.fillRect(0, 0, w, topBarHeight);
-
-    ctx.fillStyle = '#fff';
-    ctx.font = `bold ${fontSize}px "Noto Sans KR", sans-serif`;
+    ctx.font = `${fontSize}px "Noto Sans KR", sans-serif`;
     ctx.textBaseline = 'middle';
-    ctx.fillText(`📍 ${overlay.location}`, padding, topBarHeight / 2);
 
-    // 하단 바
-    const lines = [];
-    if (overlay.action) lines.push(`🔧 ${overlay.action}`);
-    if (overlay.time) lines.push(`🕐 ${overlay.time}`);
+    // 좌측 하단: 위치 정보 (작은 박스)
+    if (overlay.location) {
+        const locText = `📍 ${overlay.location}`;
+        const locWidth = ctx.measureText(locText).width + padding * 2;
+        const locHeight = lineHeight + padding;
+        const locX = padding;
+        const locY = h - locHeight - padding;
 
-    if (lines.length > 0) {
-        const bottomBarHeight = lineHeight * lines.length + padding * 2;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-        ctx.fillRect(0, h - bottomBarHeight, w, bottomBarHeight);
+        // 반투명 배경
+        ctx.fillStyle = 'rgba(0, 102, 204, 0.8)';
+        roundRect(ctx, locX, locY, locWidth, locHeight, boxRadius);
+        ctx.fill();
 
         ctx.fillStyle = '#fff';
-        ctx.font = `${fontSize * 0.9}px "Noto Sans KR", sans-serif`;
-        lines.forEach((line, i) => {
-            ctx.fillText(line, padding, h - bottomBarHeight + padding + lineHeight * (i + 0.5));
-        });
+        ctx.fillText(locText, locX + padding, locY + locHeight / 2);
     }
 
-    // LH 워터마크
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-    ctx.font = `bold ${fontSize * 0.8}px sans-serif`;
-    ctx.textAlign = 'right';
-    ctx.fillText('LH 시설관리', w - padding, topBarHeight + fontSize);
-    ctx.textAlign = 'left';
+    // 우측 하단: 조치명 + 일시 (작은 박스)
+    const infoLines = [];
+    if (overlay.action) infoLines.push(`🔧 ${overlay.action}`);
+    if (overlay.time) infoLines.push(`🕐 ${overlay.time}`);
+
+    if (infoLines.length > 0) {
+        const maxWidth = Math.max(...infoLines.map(t => ctx.measureText(t).width));
+        const boxWidth = maxWidth + padding * 2;
+        const boxHeight = lineHeight * infoLines.length + padding;
+        const boxX = w - boxWidth - padding;
+        const boxY = h - boxHeight - padding;
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        roundRect(ctx, boxX, boxY, boxWidth, boxHeight, boxRadius);
+        ctx.fill();
+
+        ctx.fillStyle = '#fff';
+        infoLines.forEach((line, i) => {
+            ctx.fillText(line, boxX + padding, boxY + padding / 2 + lineHeight * (i + 0.5));
+        });
+    }
+}
+
+// 둥근 사각형 그리기 헬퍼
+function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
 }
 
 // ===== 오버레이된 이미지 생성 =====
