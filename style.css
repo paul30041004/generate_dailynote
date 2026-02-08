@@ -236,6 +236,99 @@ body {
     color: var(--text-secondary)
 }
 
+/* 📝 템플릿 빌더 */
+.template-builder {
+    background: var(--bg-card);
+    padding: 14px;
+    border-radius: var(--radius);
+    border: 1px solid rgba(100, 200, 255, .3)
+}
+
+.term-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 10px
+}
+
+.term-btn {
+    background: linear-gradient(135deg, #2a4a6a, #1a3a5a);
+    border: 1px solid rgba(100, 200, 255, .2);
+    border-radius: var(--radius-sm);
+    padding: 10px 6px;
+    font-size: .7rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: .2s
+}
+
+.term-btn:active,
+.term-btn.selected {
+    background: linear-gradient(135deg, var(--accent-blue), #2196f3);
+    transform: scale(.95)
+}
+
+.status-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px
+}
+
+.status-btn {
+    flex: 1;
+    background: linear-gradient(135deg, #3a3a4a, #2a2a3a);
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: .2s
+}
+
+.status-btn:active {
+    transform: scale(.95)
+}
+
+.status-btn[data-status="예정"]:active,
+.status-btn[data-status="예정"].selected {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: #fff
+}
+
+.status-btn[data-status="완료"]:active,
+.status-btn[data-status="완료"].selected {
+    background: linear-gradient(135deg, #4caf50, #388e3c);
+    color: #fff
+}
+
+.status-btn[data-status="접수"]:active,
+.status-btn[data-status="접수"].selected {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: #fff
+}
+
+.template-preview {
+    background: rgba(0, 0, 0, .3);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-size: .85rem;
+    color: var(--accent-blue);
+    text-align: center;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.preview-placeholder {
+    color: var(--text-secondary);
+    font-size: .75rem
+}
+
+
 /* 카테고리 */
 .category {
     background: var(--bg-card);

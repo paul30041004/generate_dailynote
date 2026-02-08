@@ -24,7 +24,8 @@ function init() {
     updateUI();
     loadSavedMessages();
     syncBuildingSelects();
-    restoreLastAddress(); // 마지막 동/호수 자동 복원
+    restoreLastAddress();
+    setupTemplateBuilder(); // 템플릿 빌더 초기화
     createOverlayModal();
 }
 
@@ -118,6 +119,72 @@ function restoreLastAddress() {
     if (lastRoom) {
         document.querySelectorAll('input[type="number"][id^="roomNumber"]').forEach(i => i.value = lastRoom);
     }
+}
+
+// ===== 📝 템플릿 빌더 =====
+let selectedTerm = null;
+
+function setupTemplateBuilder() {
+    const termBtns = document.querySelectorAll('.term-btn');
+    const statusBtns = document.querySelectorAll('.status-btn');
+    const preview = document.getElementById('templatePreview');
+
+    termBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // 선택 표시
+            termBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedTerm = btn.dataset.term;
+
+            // 미리보기 업데이트
+            updateTemplatePreview();
+            if (navigator.vibrate) navigator.vibrate(20);
+        });
+    });
+
+    statusBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!selectedTerm) {
+                preview.innerHTML = '<span class="preview-placeholder">먼저 용어를 선택하세요</span>';
+                return;
+            }
+
+            // 문구 생성 및 추가
+            const addr = getCurrentAddress();
+            const status = btn.dataset.status;
+            const room = addr.room ? `${addr.building}동 ${addr.room}호` : `${addr.building}동`;
+            const message = `${room} 입주민 요청 ${selectedTerm} ${status}`;
+
+            addMessage(message, false);
+            saveLastAddress();
+
+            // 시각 피드백
+            btn.classList.add('selected');
+            setTimeout(() => btn.classList.remove('selected'), 300);
+
+            // 초기화
+            termBtns.forEach(b => b.classList.remove('selected'));
+            selectedTerm = null;
+            preview.innerHTML = '<span class="preview-placeholder">✅ 문구가 추가되었습니다!</span>';
+            setTimeout(() => {
+                preview.innerHTML = '<span class="preview-placeholder">용어 → 상태 순서로 선택하세요</span>';
+            }, 1500);
+
+            if (navigator.vibrate) navigator.vibrate(50);
+        });
+    });
+}
+
+function updateTemplatePreview() {
+    const preview = document.getElementById('templatePreview');
+    if (!selectedTerm) {
+        preview.innerHTML = '<span class="preview-placeholder">용어 → 상태 순서로 선택하세요</span>';
+        return;
+    }
+
+    const addr = getCurrentAddress();
+    const room = addr.room ? `${addr.building}동 ${addr.room}호` : `${addr.building}동`;
+    preview.innerHTML = `<strong>${room}</strong> 입주민 요청 <strong>${selectedTerm}</strong> [상태 선택]`;
 }
 
 // ===== 사진 위치 가져오기 =====
