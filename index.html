@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>LH 당직 인계장</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="lh-badge">LH</div>
+            <h1>시설관리 당직 인계장</h1>
+            <p class="date-display" id="dateDisplay"></p>
+        </header>
+
+        <!-- 탭 네비게이션 -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="home">🏠 세대</button>
+            <button class="tab-btn" data-tab="move">📋 입퇴거</button>
+            <button class="tab-btn" data-tab="common">🏛️ 공용</button>
+            <button class="tab-btn" data-tab="safety">🚨 안전</button>
+            <button class="tab-btn" data-tab="facility">⚙️ 기계</button>
+            <button class="tab-btn" data-tab="outdoor">🌳 외부</button>
+        </nav>
+
+        <main class="main-content">
+            <!-- ========== 세대 민원 탭 ========== -->
+            <div class="tab-content active" id="tab-home">
+                <section class="room-section">
+                    <label class="section-label">🏠 동·호수 선택</label>
+                    <div class="room-input-wrapper">
+                        <select id="buildingNumber" class="building-select">
+                            <option value="201">201동</option>
+                            <option value="202">202동</option>
+                            <option value="203">203동</option>
+                            <option value="204">204동</option>
+                            <option value="205">205동</option>
+                        </select>
+                        <input type="number" id="roomNumber" placeholder="101" min="100" max="9999">
+                        <span class="room-suffix">호</span>
+                    </div>
+                </section>
+
+                <div class="category">
+                    <h3>💡 전기설비</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn" data-phrase="전등 교체">전등 교체</button>
+                        <button class="phrase-btn" data-phrase="스위치 고장">스위치 고장</button>
+                        <button class="phrase-btn" data-phrase="콘센트 불량">콘센트 불량</button>
+                        <button class="phrase-btn" data-phrase="누전 점검">누전 점검</button>
+                        <button class="phrase-btn" data-phrase="분전반 점검">분전반 점검</button>
+                        <button class="phrase-btn" data-phrase="인터폰 고장">인터폰 고장</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>🔥 가스/보일러</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn warning" data-phrase="가스누출 신고">⚠️ 가스누출</button>
+                        <button class="phrase-btn" data-phrase="보일러 고장">보일러 고장</button>
+                        <button class="phrase-btn" data-phrase="보일러 점검">보일러 점검</button>
+                        <button class="phrase-btn" data-phrase="난방 불량">난방 불량</button>
+                        <button class="phrase-btn" data-phrase="온수 불량">온수 불량</button>
+                        <button class="phrase-btn" data-phrase="가스밸브 점검">가스밸브 점검</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>🚿 배관/급배수</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn" data-phrase="오수관 점검">오수관 점검</button>
+                        <button class="phrase-btn" data-phrase="배수구 막힘">배수구 막힘</button>
+                        <button class="phrase-btn" data-phrase="수도 누수">수도 누수</button>
+                        <button class="phrase-btn" data-phrase="변기 고장">변기 고장</button>
+                        <button class="phrase-btn" data-phrase="세면대 고장">세면대 고장</button>
+                        <button class="phrase-btn" data-phrase="싱크대 막힘">싱크대 막힘</button>
+                        <button class="phrase-btn" data-phrase="수압 불량">수압 불량</button>
+                        <button class="phrase-btn" data-phrase="동파 점검">동파 점검</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>🌀 환기설비</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn" data-phrase="환풍기 고장">환풍기 고장</button>
+                        <button class="phrase-btn" data-phrase="환풍기 소음">환풍기 소음</button>
+                        <button class="phrase-btn" data-phrase="레인지후드 고장">레인지후드</button>
+                        <button class="phrase-btn" data-phrase="욕실 환기 불량">욕실 환기</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>🔧 시설물/하자</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn" data-phrase="도어락 점검">도어락 점검</button>
+                        <button class="phrase-btn" data-phrase="창문 수리">창문 수리</button>
+                        <button class="phrase-btn" data-phrase="방충망 교체">방충망 교체</button>
+                        <button class="phrase-btn" data-phrase="화장지걸이 파손">화장지걸이</button>
+                        <button class="phrase-btn" data-phrase="타일 균열">타일 균열</button>
+                        <button class="phrase-btn" data-phrase="벽지 들뜸">벽지 들뜸</button>
+                        <button class="phrase-btn" data-phrase="곰팡이 발생">곰팡이 발생</button>
+                        <button class="phrase-btn" data-phrase="결로 현상">결로 현상</button>
+                        <button class="phrase-btn" data-phrase="바닥 소음">바닥 소음</button>
+                        <button class="phrase-btn" data-phrase="현관문 고장">현관문 고장</button>
+                        <button class="phrase-btn" data-phrase="베란다 누수">베란다 누수</button>
+                        <button class="phrase-btn" data-phrase="샤시 불량">샤시 불량</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 입퇴거 점검 탭 (LH 전용) ========== -->
+            <div class="tab-content" id="tab-move">
+                <section class="room-section">
+                    <label class="section-label">🏠 동·호수 선택</label>
+                    <div class="room-input-wrapper">
+                        <select id="buildingNumber2" class="building-select">
+                            <option value="201">201동</option>
+                            <option value="202">202동</option>
+                            <option value="203">203동</option>
+                            <option value="204">204동</option>
+                            <option value="205">205동</option>
+                        </select>
+                        <input type="number" id="roomNumber2" placeholder="101" min="100" max="9999">
+                        <span class="room-suffix">호</span>
+                    </div>
+                </section>
+
+                <div class="category lh-category">
+                    <h3>📦 퇴거 시설물 점검</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn move" data-phrase="퇴거점검 완료" data-move="true">퇴거점검 완료</button>
+                        <button class="phrase-btn move" data-phrase="퇴거점검 예정" data-move="true">퇴거점검 예정</button>
+                        <button class="phrase-btn move" data-phrase="원상복구 필요" data-move="true">원상복구 필요</button>
+                        <button class="phrase-btn move" data-phrase="도배 훼손" data-move="true">도배 훼손</button>
+                        <button class="phrase-btn move" data-phrase="장판 훼손" data-move="true">장판 훼손</button>
+                        <button class="phrase-btn move" data-phrase="타일 파손" data-move="true">타일 파손</button>
+                        <button class="phrase-btn move" data-phrase="싱크대 훼손" data-move="true">싱크대 훼손</button>
+                        <button class="phrase-btn move" data-phrase="욕실 훼손" data-move="true">욕실 훼손</button>
+                        <button class="phrase-btn move" data-phrase="현관문 훼손" data-move="true">현관문 훼손</button>
+                        <button class="phrase-btn move" data-phrase="방문 훼손" data-move="true">방문 훼손</button>
+                        <button class="phrase-btn move" data-phrase="창호 파손" data-move="true">창호 파손</button>
+                        <button class="phrase-btn move" data-phrase="붙박이장 훼손" data-move="true">붙박이장 훼손</button>
+                        <button class="phrase-btn move" data-phrase="보일러 훼손" data-move="true">보일러 훼손</button>
+                        <button class="phrase-btn move" data-phrase="가스레인지 훼손" data-move="true">가스레인지</button>
+                        <button class="phrase-btn move" data-phrase="퇴거 청소 미흡" data-move="true">청소 미흡</button>
+                        <button class="phrase-btn move" data-phrase="잔존 폐기물 있음" data-move="true">잔존 폐기물</button>
+                        <button class="phrase-btn move" data-phrase="열쇠 반납 완료" data-move="true">열쇠 반납</button>
+                        <button class="phrase-btn move" data-phrase="열쇠 미반납" data-move="true">열쇠 미반납</button>
+                    </div>
+                </div>
+
+                <div class="category lh-category">
+                    <h3>🏠 입주 시설물 점검</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn move-in" data-phrase="입주점검 완료" data-move="true">입주점검 완료</button>
+                        <button class="phrase-btn move-in" data-phrase="입주점검 예정" data-move="true">입주점검 예정</button>
+                        <button class="phrase-btn move-in" data-phrase="도배 완료" data-move="true">도배 완료</button>
+                        <button class="phrase-btn move-in" data-phrase="장판 교체 완료" data-move="true">장판 완료</button>
+                        <button class="phrase-btn move-in" data-phrase="청소 완료" data-move="true">청소 완료</button>
+                        <button class="phrase-btn move-in" data-phrase="소독 완료" data-move="true">소독 완료</button>
+                        <button class="phrase-btn move-in" data-phrase="시설 양호" data-move="true">시설 양호</button>
+                        <button class="phrase-btn move-in" data-phrase="열쇠 인계 완료" data-move="true">열쇠 인계</button>
+                        <button class="phrase-btn move-in" data-phrase="수도 개통 확인" data-move="true">수도 개통</button>
+                        <button class="phrase-btn move-in" data-phrase="가스 개통 확인" data-move="true">가스 개통</button>
+                        <button class="phrase-btn move-in" data-phrase="전기 개통 확인" data-move="true">전기 개통</button>
+                        <button class="phrase-btn move-in" data-phrase="난방 테스트 완료" data-move="true">난방 테스트</button>
+                    </div>
+                </div>
+
+                <div class="category lh-category">
+                    <h3>📝 LH 업무</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common lh" data-phrase="공가 순찰 완료" data-common="true">공가 순찰</button>
+                        <button class="phrase-btn common lh" data-phrase="공가 상태 양호" data-common="true">공가 양호</button>
+                        <button class="phrase-btn common lh" data-phrase="공가 환기 완료" data-common="true">공가 환기</button>
+                        <button class="phrase-btn common lh" data-phrase="하자보수 접수" data-common="true">하자 접수</button>
+                        <button class="phrase-btn common lh" data-phrase="하자보수 완료" data-common="true">하자 완료</button>
+                        <button class="phrase-btn common lh" data-phrase="임대료 관련 문의" data-common="true">임대료 문의</button>
+                        <button class="phrase-btn common lh" data-phrase="계약 관련 문의" data-common="true">계약 문의</button>
+                        <button class="phrase-btn common lh" data-phrase="마이홈센터 안내" data-common="true">마이홈 안내</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 공용시설 탭 ========== -->
+            <div class="tab-content" id="tab-common">
+                <div class="category">
+                    <h3>🛗 승강기</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="승강기 고장" data-common="true">승강기 고장</button>
+                        <button class="phrase-btn common" data-phrase="승강기 점검 완료" data-common="true">점검 완료</button>
+                        <button class="phrase-btn common" data-phrase="승강기 소음" data-common="true">소음 발생</button>
+                        <button class="phrase-btn common" data-phrase="승강기 버튼 불량" data-common="true">버튼 불량</button>
+                        <button class="phrase-btn common warning" data-phrase="승강기 갇힘 사고" data-common="true">⚠️ 갇힘
+                            사고</button>
+                        <button class="phrase-btn common" data-phrase="승강기 조명 교체" data-common="true">조명 교체</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>🏋️ 주민운동시설</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="운동시설 정상 작동" data-common="true">정상 작동</button>
+                        <button class="phrase-btn common" data-phrase="운동시설 파손" data-common="true">파손 발견</button>
+                        <button class="phrase-btn common" data-phrase="녹물/도장 상태 불량" data-common="true">녹/도장 불량</button>
+                        <button class="phrase-btn common" data-phrase="안전 안내문 부착" data-common="true">안내문 부착</button>
+                        <button class="phrase-btn common" data-phrase="운동기구 수리 필요" data-common="true">수리 필요</button>
+                        <button class="phrase-btn common" data-phrase="운동시설 청소 완료" data-common="true">청소 완료</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>🎠 어린이놀이터</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="놀이터 점검 완료" data-common="true">점검 완료</button>
+                        <button class="phrase-btn common" data-phrase="놀이기구 파손" data-common="true">기구 파손</button>
+                        <button class="phrase-btn common" data-phrase="바닥재 손상" data-common="true">바닥재 손상</button>
+                        <button class="phrase-btn common" data-phrase="모래 교체 필요" data-common="true">모래 교체</button>
+                        <button class="phrase-btn common" data-phrase="놀이터 조명 점검" data-common="true">조명 점검</button>
+                        <button class="phrase-btn common" data-phrase="안전표지 점검" data-common="true">안전표지</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>👴 경로당</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="경로당 냉방 점검" data-common="true">냉방 점검</button>
+                        <button class="phrase-btn common" data-phrase="경로당 난방 점검" data-common="true">난방 점검</button>
+                        <button class="phrase-btn common" data-phrase="경로당 청소 완료" data-common="true">청소 완료</button>
+                        <button class="phrase-btn common" data-phrase="경로당 시설 점검" data-common="true">시설 점검</button>
+                        <button class="phrase-btn common" data-phrase="경로당 조명 교체" data-common="true">조명 교체</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>📚 작은도서관</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="도서관 냉방 양호" data-common="true">냉방 양호</button>
+                        <button class="phrase-btn common" data-phrase="도서관 난방 양호" data-common="true">난방 양호</button>
+                        <button class="phrase-btn common" data-phrase="도서관 냉난방 불량" data-common="true">냉난방 불량</button>
+                        <button class="phrase-btn common" data-phrase="도서관 조명 점검" data-common="true">조명 점검</button>
+                        <button class="phrase-btn common" data-phrase="도서관 청소 완료" data-common="true">청소 완료</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>☕ 주민공동시설</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="주민카페 점검" data-common="true">카페 점검</button>
+                        <button class="phrase-btn common" data-phrase="커뮤니티홀 대관" data-common="true">대관 확인</button>
+                        <button class="phrase-btn common" data-phrase="커뮤니티홀 청소" data-common="true">청소 완료</button>
+                        <button class="phrase-btn common" data-phrase="커뮤니티 냉난방 점검" data-common="true">냉난방 점검</button>
+                        <button class="phrase-btn common" data-phrase="음향/영상 점검" data-common="true">음향 점검</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>♻️ 재활용장</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="분리수거 완료" data-common="true">분리수거</button>
+                        <button class="phrase-btn common" data-phrase="재활용장 청소 필요" data-common="true">청소 필요</button>
+                        <button class="phrase-btn common" data-phrase="재활용장 악취" data-common="true">악취 발생</button>
+                        <button class="phrase-btn common" data-phrase="대형폐기물 수거 필요" data-common="true">대형폐기물</button>
+                        <button class="phrase-btn common" data-phrase="음식물 처리" data-common="true">음식물 처리</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 안전/경보 탭 ========== -->
+            <div class="tab-content" id="tab-safety">
+                <div class="category alert-category">
+                    <h3>🚨 경보상황</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common warning" data-phrase="🚨 가스누출경보 발생"
+                            data-common="true">가스누출경보</button>
+                        <button class="phrase-btn common warning" data-phrase="🚨 화재경보 발생"
+                            data-common="true">화재경보</button>
+                        <button class="phrase-btn common warning" data-phrase="🚨 승강기 비상벨" data-common="true">승강기
+                            비상벨</button>
+                        <button class="phrase-btn common warning" data-phrase="🚨 침입경보 발생"
+                            data-common="true">침입경보</button>
+                        <button class="phrase-btn common" data-phrase="경보 오작동 확인" data-common="true">오작동 확인</button>
+                        <button class="phrase-btn common" data-phrase="경보 테스트 완료" data-common="true">테스트 완료</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>📡 수신기/감지기</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common warning" data-phrase="송수신기 오류" data-common="true">송수신기
+                            오류</button>
+                        <button class="phrase-btn common" data-phrase="수신기 정상 작동" data-common="true">수신기 정상</button>
+                        <button class="phrase-btn common" data-phrase="감지기 오류" data-common="true">감지기 오류</button>
+                        <button class="phrase-btn common" data-phrase="감지기 점검 완료" data-common="true">감지기 점검</button>
+                        <button class="phrase-btn common" data-phrase="발신기 점검 완료" data-common="true">발신기 점검</button>
+                        <button class="phrase-btn common" data-phrase="비상방송 테스트" data-common="true">비상방송</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>🧯 소방시설</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="소화전 점검 완료" data-common="true">소화전 점검</button>
+                        <button class="phrase-btn common" data-phrase="소화전 압력 이상" data-common="true">압력 이상</button>
+                        <button class="phrase-btn common" data-phrase="소화기 점검 완료" data-common="true">소화기 점검</button>
+                        <button class="phrase-btn common" data-phrase="스프링클러 점검" data-common="true">스프링클러</button>
+                        <button class="phrase-btn common" data-phrase="유도등 점검" data-common="true">유도등 점검</button>
+                        <button class="phrase-btn common" data-phrase="방화문 확인" data-common="true">방화문 확인</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>📹 CCTV/보안</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="CCTV 정상 작동" data-common="true">CCTV 정상</button>
+                        <button class="phrase-btn common" data-phrase="CCTV 불량" data-common="true">CCTV 불량</button>
+                        <button class="phrase-btn common" data-phrase="녹화장치 점검" data-common="true">녹화장치</button>
+                        <button class="phrase-btn common" data-phrase="출입통제 점검" data-common="true">출입통제</button>
+                        <button class="phrase-btn common" data-phrase="차단기 점검" data-common="true">차단기 점검</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 기계/설비 탭 ========== -->
+            <div class="tab-content" id="tab-facility">
+                <div class="category">
+                    <h3>🅿️ 지하주차장</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="지하주차장 순찰 완료" data-common="true">순찰 완료</button>
+                        <button class="phrase-btn common" data-phrase="주차장 조명 점검" data-common="true">조명 점검</button>
+                        <button class="phrase-btn common" data-phrase="주차장 조명 교체" data-common="true">조명 교체</button>
+                        <button class="phrase-btn common" data-phrase="환기팬 점검" data-common="true">환기팬 점검</button>
+                        <button class="phrase-btn common" data-phrase="주차장 누수" data-common="true">누수 발생</button>
+                        <button class="phrase-btn common" data-phrase="주차장 바닥 균열" data-common="true">바닥 균열</button>
+                        <button class="phrase-btn common" data-phrase="주차라인 도색 필요" data-common="true">라인 도색</button>
+                        <button class="phrase-btn common" data-phrase="무단주차 확인" data-common="true">무단주차</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>💧 펌프실/배수</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="펌프실 점검 완료" data-common="true">펌프실 점검</button>
+                        <button class="phrase-btn common" data-phrase="배수펌프 정상" data-common="true">배수펌프 정상</button>
+                        <button class="phrase-btn common" data-phrase="배수펌프 이상" data-common="true">배수펌프 이상</button>
+                        <button class="phrase-btn common" data-phrase="급수펌프 점검" data-common="true">급수펌프</button>
+                        <button class="phrase-btn common" data-phrase="소화펌프 점검" data-common="true">소화펌프</button>
+                        <button class="phrase-btn common" data-phrase="집수정 청소 필요" data-common="true">집수정 청소</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>🏗️ 저수조</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="저수조 수위 정상" data-common="true">수위 정상</button>
+                        <button class="phrase-btn common" data-phrase="저수조 수위 이상" data-common="true">수위 이상</button>
+                        <button class="phrase-btn common" data-phrase="저수조 청소 예정" data-common="true">청소 예정</button>
+                        <button class="phrase-btn common" data-phrase="고가수조 점검" data-common="true">고가수조</button>
+                        <button class="phrase-btn common" data-phrase="수질검사 완료" data-common="true">수질검사</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>⚡ 발전기/전기실</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="발전기실 점검" data-common="true">발전기 점검</button>
+                        <button class="phrase-btn common" data-phrase="발전기 시운전" data-common="true">시운전 완료</button>
+                        <button class="phrase-btn common" data-phrase="발전기 연료 확인" data-common="true">연료 확인</button>
+                        <button class="phrase-btn common" data-phrase="전기실 점검" data-common="true">전기실 점검</button>
+                        <button class="phrase-btn common" data-phrase="수배전반 점검" data-common="true">수배전반</button>
+                        <button class="phrase-btn common warning" data-phrase="정전 발생" data-common="true">⚠️ 정전</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>📡 MDF/통신실</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="MDF실 점검" data-common="true">MDF 점검</button>
+                        <button class="phrase-btn common" data-phrase="통신장비 정상" data-common="true">통신 정상</button>
+                        <button class="phrase-btn common" data-phrase="인터넷 장애" data-common="true">인터넷 장애</button>
+                        <button class="phrase-btn common" data-phrase="공용 WIFI 점검" data-common="true">WIFI 점검</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>🛡️ 방재실</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="방재실 근무 정상" data-common="true">근무 정상</button>
+                        <button class="phrase-btn common" data-phrase="방재실 장비 점검" data-common="true">장비 점검</button>
+                        <button class="phrase-btn common" data-phrase="모니터링 이상무" data-common="true">모니터링 정상</button>
+                        <button class="phrase-btn common" data-phrase="방재실 에어컨 점검" data-common="true">에어컨 점검</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== 외부시설 탭 ========== -->
+            <div class="tab-content" id="tab-outdoor">
+                <div class="category">
+                    <h3>🌳 조경/수목</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="수목 관수 완료" data-common="true">관수 완료</button>
+                        <button class="phrase-btn common" data-phrase="잔디 관리 필요" data-common="true">잔디 관리</button>
+                        <button class="phrase-btn common" data-phrase="수목 전지작업 필요" data-common="true">전지 작업</button>
+                        <button class="phrase-btn common" data-phrase="병충해 방제" data-common="true">병충해 방제</button>
+                        <button class="phrase-btn common" data-phrase="낙엽 청소 완료" data-common="true">낙엽 청소</button>
+                        <button class="phrase-btn common" data-phrase="관수시설 점검" data-common="true">관수시설</button>
+                        <button class="phrase-btn common" data-phrase="수목 고사" data-common="true">수목 고사</button>
+                        <button class="phrase-btn common" data-phrase="화단 정리" data-common="true">화단 정리</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>🏠 공용 현관/복도</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="공용 현관문 점검" data-common="true">현관문 점검</button>
+                        <button class="phrase-btn common" data-phrase="복도 조명 점검" data-common="true">복도 조명</button>
+                        <button class="phrase-btn common" data-phrase="계단실 청소" data-common="true">계단실 청소</button>
+                        <button class="phrase-btn common" data-phrase="우편함 점검" data-common="true">우편함 점검</button>
+                        <button class="phrase-btn common" data-phrase="옥상 출입문 점검" data-common="true">옥상 출입문</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>🚗 외부 주차/도로</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="외부 주차장 순찰" data-common="true">외부 주차장</button>
+                        <button class="phrase-btn common" data-phrase="단지 도로 점검" data-common="true">도로 점검</button>
+                        <button class="phrase-btn common" data-phrase="과속방지턱 점검" data-common="true">과속방지턱</button>
+                        <button class="phrase-btn common" data-phrase="보도블록 파손" data-common="true">보도블록</button>
+                        <button class="phrase-btn common" data-phrase="맨홀 점검" data-common="true">맨홀 점검</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>💡 외부 조명</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="가로등 점등 확인" data-common="true">가로등 점등</button>
+                        <button class="phrase-btn common" data-phrase="가로등 불량" data-common="true">가로등 불량</button>
+                        <button class="phrase-btn common" data-phrase="보안등 점검" data-common="true">보안등 점검</button>
+                        <button class="phrase-btn common" data-phrase="경관조명 점검" data-common="true">경관조명</button>
+                        <button class="phrase-btn common" data-phrase="센서등 점검" data-common="true">센서등</button>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <h3>🌧️ 우천/동절기</h3>
+                    <div class="button-grid">
+                        <button class="phrase-btn common" data-phrase="배수로 점검" data-common="true">배수로 점검</button>
+                        <button class="phrase-btn common" data-phrase="빗물받이 청소" data-common="true">빗물받이</button>
+                        <button class="phrase-btn common" data-phrase="제설작업 완료" data-common="true">제설 완료</button>
+                        <button class="phrase-btn common" data-phrase="염화칼슘 살포" data-common="true">염화칼슘</button>
+                        <button class="phrase-btn common" data-phrase="동파방지 조치" data-common="true">동파방지</button>
+                        <button class="phrase-btn common" data-phrase="강풍 피해 점검" data-common="true">강풍 피해</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 메시지 미리보기 (항상 표시) -->
+            <section class="preview-section">
+                <div class="preview-header">
+                    <label class="section-label">📝 인계 내용</label>
+                    <span class="message-count" id="messageCount">0건</span>
+                </div>
+                <div class="message-list" id="messageList">
+                    <p class="placeholder-text">버튼을 눌러 인계사항을 추가하세요</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <button class="clear-btn" id="clearBtn">🗑️ 삭제</button>
+            <button class="send-btn" id="sendBtn">📲 카톡 전송</button>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
