@@ -1,6 +1,7 @@
 // ===== 앱 상태 =====
 let messages = [];
-let photos = []; // 사진 배열 (File 객체)
+let photos = []; // {file, overlay} 객체 배열
+let currentPhotoIndex = -1; // 오버레이 편집 중인 사진
 
 // ===== DOM 요소 =====
 const dateDisplay = document.getElementById('dateDisplay');
@@ -23,6 +24,7 @@ function init() {
     updateUI();
     loadSavedMessages();
     syncBuildingSelects();
+    createOverlayModal();
 }
 
 // ===== 날짜 표시 =====
@@ -58,7 +60,6 @@ function setupEventListeners() {
         });
     });
 
-    // 사진 입력
     if (cameraInput) cameraInput.addEventListener('change', handlePhotoInput);
     if (galleryInput) galleryInput.addEventListener('change', handlePhotoInput);
 
@@ -69,12 +70,24 @@ function setupEventListeners() {
 // ===== 사진 처리 =====
 function handlePhotoInput(e) {
     const files = Array.from(e.target.files);
+    const addr = getCurrentAddress();
+    const now = new Date();
+    const timeStr = now.toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
     files.forEach(file => {
         if (file.type.startsWith('image/')) {
-            photos.push(file);
+            photos.push({
+                file: file,
+                overlay: {
+                    location: addr.room ? `${addr.building}동 ${addr.room}호` : `${addr.building}동`,
+                    action: '시설점검',
+                    time: timeStr,
+                    enabled: true
+                }
+            });
         }
     });
-    e.target.value = ''; // 같은 파일 재선택 가능
+    e.target.value = '';
     updatePhotoUI();
     if (navigator.vibrate) navigator.vibrate(30);
 }
@@ -89,17 +102,193 @@ function updatePhotoUI() {
     if (photos.length === 0) {
         photoPreview.innerHTML = '';
     } else {
-        photoPreview.innerHTML = photos.map((file, i) => {
-            const url = URL.createObjectURL(file);
+        photoPreview.innerHTML = photos.map((p, i) => {
+            const url = URL.createObjectURL(p.file);
             return `
                 <div class="photo-item">
-                    <img src="${url}" alt="사진 ${i + 1}">
+                    <img src="${url}" alt="사진 ${i + 1}" onclick="editOverlay(${i})">
+                    <div class="overlay-badge" onclick="editOverlay(${i})">✎</div>
                     <button class="remove-photo" onclick="removePhoto(${i})">✕</button>
                 </div>
             `;
         }).join('');
     }
     updateSendButton();
+}
+
+// ===== 오버레이 모달 생성 =====
+function createOverlayModal() {
+    const modal = document.createElement('div');
+    modal.id = 'overlayModal';
+    modal.className = 'overlay-modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📝 사진 정보 편집</h3>
+                <button class="modal-close" onclick="closeOverlayModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-preview">
+                    <canvas id="previewCanvas"></canvas>
+                </div>
+                <div class="modal-fields">
+                    <div class="field-group">
+                        <label>📍 위치</label>
+                        <input type="text" id="overlayLocation" placeholder="201동 101호">
+                    </div>
+                    <div class="field-group">
+                        <label>🔧 조치내용</label>
+                        <input type="text" id="overlayAction" placeholder="전등 교체">
+                    </div>
+                    <div class="field-group">
+                        <label>🕐 일시</label>
+                        <input type="text" id="overlayTime" placeholder="2/8 14:30">
+                    </div>
+                    <div class="field-group checkbox">
+                        <label><input type="checkbox" id="overlayEnabled" checked> 오버레이 표시</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeOverlayModal()">취소</button>
+                <button class="modal-btn save" onclick="saveOverlay()">저장</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // 입력 변경 시 실시간 미리보기
+    ['overlayLocation', 'overlayAction', 'overlayTime', 'overlayEnabled'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updatePreviewCanvas);
+        document.getElementById(id).addEventListener('change', updatePreviewCanvas);
+    });
+}
+
+function editOverlay(index) {
+    currentPhotoIndex = index;
+    const p = photos[index];
+
+    document.getElementById('overlayLocation').value = p.overlay.location;
+    document.getElementById('overlayAction').value = p.overlay.action;
+    document.getElementById('overlayTime').value = p.overlay.time;
+    document.getElementById('overlayEnabled').checked = p.overlay.enabled;
+
+    document.getElementById('overlayModal').classList.add('show');
+    updatePreviewCanvas();
+}
+
+function closeOverlayModal() {
+    document.getElementById('overlayModal').classList.remove('show');
+    currentPhotoIndex = -1;
+}
+
+function saveOverlay() {
+    if (currentPhotoIndex < 0) return;
+
+    photos[currentPhotoIndex].overlay = {
+        location: document.getElementById('overlayLocation').value,
+        action: document.getElementById('overlayAction').value,
+        time: document.getElementById('overlayTime').value,
+        enabled: document.getElementById('overlayEnabled').checked
+    };
+
+    closeOverlayModal();
+    updatePhotoUI();
+}
+
+function updatePreviewCanvas() {
+    if (currentPhotoIndex < 0) return;
+
+    const canvas = document.getElementById('previewCanvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+        const maxW = 300, maxH = 300;
+        let w = img.width, h = img.height;
+        if (w > maxW) { h = h * maxW / w; w = maxW; }
+        if (h > maxH) { w = w * maxH / h; h = maxH; }
+
+        canvas.width = w;
+        canvas.height = h;
+        ctx.drawImage(img, 0, 0, w, h);
+
+        if (document.getElementById('overlayEnabled').checked) {
+            drawOverlayOnCanvas(ctx, w, h, {
+                location: document.getElementById('overlayLocation').value,
+                action: document.getElementById('overlayAction').value,
+                time: document.getElementById('overlayTime').value
+            });
+        }
+    };
+
+    img.src = URL.createObjectURL(photos[currentPhotoIndex].file);
+}
+
+// ===== 오버레이 그리기 =====
+function drawOverlayOnCanvas(ctx, w, h, overlay) {
+    const fontSize = Math.max(12, Math.floor(w / 20));
+    const padding = fontSize * 0.5;
+    const lineHeight = fontSize * 1.4;
+
+    // 상단 바
+    const topBarHeight = lineHeight + padding * 2;
+    ctx.fillStyle = 'rgba(0, 102, 204, 0.85)';
+    ctx.fillRect(0, 0, w, topBarHeight);
+
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${fontSize}px "Noto Sans KR", sans-serif`;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`📍 ${overlay.location}`, padding, topBarHeight / 2);
+
+    // 하단 바
+    const lines = [];
+    if (overlay.action) lines.push(`🔧 ${overlay.action}`);
+    if (overlay.time) lines.push(`🕐 ${overlay.time}`);
+
+    if (lines.length > 0) {
+        const bottomBarHeight = lineHeight * lines.length + padding * 2;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+        ctx.fillRect(0, h - bottomBarHeight, w, bottomBarHeight);
+
+        ctx.fillStyle = '#fff';
+        ctx.font = `${fontSize * 0.9}px "Noto Sans KR", sans-serif`;
+        lines.forEach((line, i) => {
+            ctx.fillText(line, padding, h - bottomBarHeight + padding + lineHeight * (i + 0.5));
+        });
+    }
+
+    // LH 워터마크
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.font = `bold ${fontSize * 0.8}px sans-serif`;
+    ctx.textAlign = 'right';
+    ctx.fillText('LH 시설관리', w - padding, topBarHeight + fontSize);
+    ctx.textAlign = 'left';
+}
+
+// ===== 오버레이된 이미지 생성 =====
+async function createOverlayedImage(photoObj) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+
+            ctx.drawImage(img, 0, 0);
+
+            if (photoObj.overlay.enabled) {
+                drawOverlayOnCanvas(ctx, img.width, img.height, photoObj.overlay);
+            }
+
+            canvas.toBlob(blob => {
+                const filename = `LH_${photoObj.overlay.location.replace(/\s/g, '_')}_${Date.now()}.jpg`;
+                resolve(new File([blob], filename, { type: 'image/jpeg' }));
+            }, 'image/jpeg', 0.9);
+        };
+        img.src = URL.createObjectURL(photoObj.file);
+    });
 }
 
 // ===== 탭 전환 =====
@@ -199,11 +388,13 @@ function loadSavedMessages() {
 async function sendToKakao() {
     if (messages.length === 0 && photos.length === 0) return;
 
+    sendBtn.textContent = '⏳ 처리중...';
+    sendBtn.disabled = true;
+
     const now = new Date();
     const timeStr = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
     const dateStr = now.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
 
-    // 메시지 분류
     const alerts = messages.filter(m => m.includes('🚨') || m.includes('⚠️'));
     const moveOut = messages.filter(m => m.includes('퇴거') || m.includes('원상복구') || m.includes('훼손') || m.includes('미반납'));
     const moveIn = messages.filter(m => m.includes('입주') || m.includes('열쇠 인계') || m.includes('개통'));
@@ -218,18 +409,28 @@ async function sendToKakao() {
 
     const fullMessage = `🏢 LH 당직 인계 (${dateStr} ${timeStr})\n\n${body.trim()}\n\n- 당직자 올림`;
 
-    // Web Share API (사진 포함 공유)
+    // 오버레이된 사진 생성
+    let processedPhotos = [];
+    if (photos.length > 0) {
+        for (const p of photos) {
+            const processed = await createOverlayedImage(p);
+            processedPhotos.push(processed);
+        }
+    }
+
+    // Web Share API
     if (navigator.share && navigator.canShare) {
         const shareData = { title: 'LH 당직 인계장', text: fullMessage };
 
-        // 사진 있으면 파일도 포함
-        if (photos.length > 0) {
-            shareData.files = photos;
+        if (processedPhotos.length > 0) {
+            shareData.files = processedPhotos;
         }
 
         if (navigator.canShare(shareData)) {
             try {
                 await navigator.share(shareData);
+                sendBtn.textContent = '📲 카톡 전송';
+                sendBtn.disabled = false;
                 if (confirm('전송 완료! 초기화할까요?')) {
                     messages = []; photos = [];
                     updateUI(); updatePhotoUI(); saveMessages();
@@ -239,11 +440,14 @@ async function sendToKakao() {
         }
     }
 
-    // 폴백: 텍스트만 복사 + 사진 별도 안내
+    // 폴백
+    sendBtn.textContent = '📲 카톡 전송';
+    sendBtn.disabled = false;
+
     navigator.clipboard.writeText(fullMessage).then(() => {
         let msg = '📋 텍스트가 복사되었습니다!';
         if (photos.length > 0) {
-            msg += `\n\n📷 사진 ${photos.length}장은 별도로 전송해주세요.`;
+            msg += `\n\n📷 사진 ${photos.length}장은 별도로 전송해주세요.\n(사진에 위치/조치명 오버레이 적용됨)`;
         }
         alert(msg);
     }).catch(() => {
@@ -253,14 +457,39 @@ async function sendToKakao() {
         ta.select();
         document.execCommand('copy');
         document.body.removeChild(ta);
-        alert('📋 복사 완료! 사진은 별도 전송해주세요.');
+        alert('📋 복사 완료!');
     });
 }
 
-// Shake 애니메이션
+// ===== 스타일 추가 =====
 const style = document.createElement('style');
-style.textContent = '@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}';
+style.textContent = `
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+.overlay-badge{position:absolute;bottom:4px;left:4px;background:rgba(0,102,204,.9);color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer}
+
+.overlay-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.8);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.overlay-modal.show{display:flex}
+.modal-content{background:#16213e;border-radius:16px;width:100%;max-width:400px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.modal-header h3{color:#fff;font-size:1rem;margin:0}
+.modal-close{background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer}
+.modal-body{padding:16px;overflow-y:auto}
+.modal-preview{background:#0f0f23;border-radius:8px;padding:10px;margin-bottom:16px;display:flex;justify-content:center}
+.modal-preview canvas{max-width:100%;border-radius:4px}
+.modal-fields{display:flex;flex-direction:column;gap:12px}
+.field-group{display:flex;flex-direction:column;gap:4px}
+.field-group label{color:rgba(255,255,255,.7);font-size:.8rem}
+.field-group input[type="text"]{background:#0f3460;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:10px 12px;color:#fff;font-size:.9rem}
+.field-group input[type="text"]:focus{border-color:#0066cc;outline:none}
+.field-group.checkbox{flex-direction:row;align-items:center}
+.field-group.checkbox label{display:flex;align-items:center;gap:8px;color:#fff}
+.field-group.checkbox input{width:18px;height:18px}
+.modal-footer{display:flex;gap:10px;padding:16px;border-top:1px solid rgba(255,255,255,.1)}
+.modal-btn{flex:1;padding:12px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer}
+.modal-btn.cancel{background:#424242;color:#fff}
+.modal-btn.save{background:#0066cc;color:#fff}
+`;
 document.head.appendChild(style);
 
 document.addEventListener('DOMContentLoaded', init);
-
