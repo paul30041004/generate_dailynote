@@ -180,9 +180,7 @@ function updateTemplatePreview() {
         return;
     }
 
-    const addr = getCurrentAddress();
-    const room = addr.room ? `${addr.building}동 ${addr.room}호` : `${addr.building}동`;
-    preview.innerHTML = `<strong>${room}</strong> 입주민 요청 <strong>${selectedTerm}</strong> [상태 선택]`;
+    preview.innerHTML = `입주민 요청 <strong>${selectedTerm}</strong> [상태 선택]`;
 }
 
 // ===== 사진 위치 가져오기 =====
