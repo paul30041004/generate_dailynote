@@ -34,12 +34,20 @@ function updateDate() {
     dateDisplay.textContent = now.toLocaleDateString('ko-KR', options);
 }
 
-// ===== 동 선택 동기화 =====
+// ===== 동/호수 선택 동기화 =====
 function syncBuildingSelects() {
     const selects = document.querySelectorAll('.building-select');
+    const roomInputs = document.querySelectorAll('input[type="number"][id^="roomNumber"]');
+
     selects.forEach(select => {
         select.addEventListener('change', function () {
             selects.forEach(s => s.value = this.value);
+        });
+    });
+
+    roomInputs.forEach(input => {
+        input.addEventListener('input', function () {
+            roomInputs.forEach(r => { if (r !== this) r.value = this.value; });
         });
     });
 }
