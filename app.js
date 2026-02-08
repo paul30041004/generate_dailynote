@@ -149,11 +149,16 @@ function setupTemplateBuilder() {
                 return;
             }
 
-            // 문구 생성 (동/호수는 addMessage에서 자동 추가됨)
+            // 문구 생성 (여기서 동/호수 한 번만 추가)
+            const addr = getCurrentAddress();
+            if (!addr.room) {
+                alert('호수를 입력해주세요!');
+                return;
+            }
             const status = btn.dataset.status;
-            const message = `입주민 요청 ${selectedTerm} ${status}`;
+            const message = `${addr.building}동 ${addr.room}호 입주민 요청 ${selectedTerm} ${status}`;
 
-            addMessage(message, false); // isCommon=false → 동/호수 자동 추가
+            addMessage(message, true); // isCommon=true → 동/호수 추가 안 함
             saveLastAddress();
 
             // 시각 피드백
