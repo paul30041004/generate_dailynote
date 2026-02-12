@@ -27,6 +27,7 @@ function init() {
     syncBuildingSelects();
     restoreLastAddress();
     setupTemplateBuilder(); // 템플릿 빌더 초기화
+    setupShortcuts(); // ⌨️ 단축키 및 제스처 초기화
     createOverlayModal();
 }
 
@@ -653,5 +654,95 @@ style.textContent = `
 .modal-btn.save{background:#0066cc;color:#fff}
 `;
 document.head.appendChild(style);
+
+// ===== ⌨️ 단축키 및 제스처 =====
+function setupShortcuts() {
+    // 1. 키보드 단축키
+    document.addEventListener('keydown', (e) => {
+        // 입력 필드 포커스 중일 때는 단축키 비활성화 (Esc 제외)
+        const isInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT';
+
+        if (e.key === 'Escape') {
+            if (isInput) e.target.blur();
+            // 모달 닫기
+            const modal = document.getElementById('overlayModal');
+            if (modal && modal.classList.contains('show')) {
+                modal.classList.remove('show');
+            }
+            return;
+        }
+
+        if (isInput) return;
+
+        switch (e.key) {
+            case '1': switchTab('home'); break;
+            case '2': switchTab('move'); break;
+            case '3': switchTab('common'); break;
+            case '4': switchTab('safety'); break;
+            case '5': switchTab('facility'); break;
+            case '6': switchTab('outdoor'); break;
+            case 'c': case 'C':
+                if (cameraInput) cameraInput.click();
+                break;
+            case ' ': // Space -> 이상무 확인
+                e.preventDefault();
+                const normalBtn = document.getElementById('quickNormal');
+                if (normalBtn) normalBtn.click();
+                break;
+        }
+    });
+
+    // 2. 모바일 스와이프 (탭 전환)
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const minSwipeDistance = 50;
+    const mainContent = document.querySelector('.main-content');
+
+    if (mainContent) {
+        mainContent.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        mainContent.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+    }
+
+    function handleSwipe() {
+        if (Math.abs(touchEndX - touchStartX) < minSwipeDistance) return;
+
+        const tabs = ['home', 'move', 'common', 'safety', 'facility', 'outdoor'];
+        const activeBtn = document.querySelector('.tab-btn.active');
+        if (!activeBtn) return;
+
+        const currentIndex = tabs.indexOf(activeBtn.dataset.tab);
+        if (currentIndex === -1) return;
+
+        if (touchEndX < touchStartX) {
+            // 왼쪽 스와이프 -> 다음 탭
+            const nextIndex = (currentIndex + 1) % tabs.length;
+            switchTab(tabs[nextIndex]);
+        } else {
+            // 오른쪽 스와이프 -> 이전 탭
+            const prevIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+            switchTab(tabs[prevIndex]);
+        }
+    }
+    // 3. 도움말 버튼
+    const helpBtn = document.getElementById('helpBtn');
+    if (helpBtn) {
+        helpBtn.addEventListener('click', () => {
+            alert(
+                '⌨️ 키보드 단축키\n\n' +
+                '1~6 : 탭 전환 (세대~외부)\n' +
+                'C : 📷 카메라 촬영\n' +
+                'Space : ✅ "이상무" 빠른 입력\n\n' +
+                '👆 터치 제스처\n' +
+                '왼쪽/오른쪽 스와이프 : 탭 전환'
+            );
+        });
+    }
+}
 
 document.addEventListener('DOMContentLoaded', init);
